@@ -119,35 +119,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_normal"
-            android:layout_marginTop="@dimen/margin_normal"
             app:layout_constraintStart_toEndOf="@id/label_activity_todo_item_priority"
             app:layout_constraintEnd_toStartOf="@id/action_activity_todo_item_priority_increase"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/radio_activity_todo_item_repeat"
-            android:minEms="1"
-            android:maxEms="1"
+            app:layout_constraintTop_toTopOf="@id/label_activity_todo_item_priority"
+            app:layout_constraintBottom_toBottomOf="@id/label_activity_todo_item_priority"
             tools:text="0"/>
 
-        <TextView
+        <ImageView
             android:id="@+id/action_activity_todo_item_priority_increase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_normal"
             android:layout_marginTop="@dimen/margin_normal"
             app:layout_constraintStart_toEndOf="@id/label_activity_todo_item_priority_value"
             app:layout_constraintTop_toBottomOf="@id/radio_activity_todo_item_repeat"
-            tools:text="+"/>
+            android:src="@android:drawable/arrow_up_float"/>
 
-        <TextView
+        <ImageView
             android:id="@+id/action_activity_todo_item_priority_decrease"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_normal"
             android:layout_marginTop="@dimen/margin_normal"
             app:layout_constraintStart_toStartOf="@id/action_activity_todo_item_priority_increase"
             app:layout_constraintEnd_toEndOf="@id/action_activity_todo_item_priority_increase"
             app:layout_constraintTop_toBottomOf="@id/action_activity_todo_item_priority_increase"
-            tools:text="-"/>
+            android:src="@android:drawable/arrow_down_float"/>
 
     </android.support.constraint.ConstraintLayout>
 
