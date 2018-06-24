@@ -1,23 +1,32 @@
 package com.akhandanyan.todoapp.model;
 
-public class TodoItem {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.Date;
+
+public class TodoItem implements Parcelable {
     public static final int PRIORITY_MAX = 5;
     public static final int PRIORITY_MIN = 0;
 
-    private String id;
+    private String mId;
     private String mTitle;
     private String mDescription;
-    private String mDate;
+    private Date mDate;
     private boolean mShouldRemind;
     private int mPriority;
     private Repeat mRepeatType;
 
+    public TodoItem() {
+
+    }
+
     public String getId() {
-        return id;
+        return mId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.mId = id;
     }
 
     public String getTitle() {
@@ -36,11 +45,11 @@ public class TodoItem {
         mDescription = description;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return mDate;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         mDate = date;
     }
 
@@ -77,8 +86,8 @@ public class TodoItem {
         final int prime = 31;
         int result = 1;
 
-        // --- Attribute id
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        // --- Attribute mId
+        result = prime * result + ((mId == null) ? 0 : mId.hashCode());
 
         return result;
     }
@@ -92,23 +101,67 @@ public class TodoItem {
         if (this.getClass() != obj.getClass())
             return false;
         TodoItem other = (TodoItem) obj;
-        // --- Attribute id
-        if (id == null) {
-            return other.id == null;
+        // --- Attribute mId
+        if (mId == null) {
+            return other.mId == null;
         } else {
-            return id.equals(other.id);
+            return mId.equals(other.mId);
         }
     }
 
     @Override
     public String toString() {
-        return  "[" + id + "]:"
+        return  "[" + mId + "]:"
                 + mTitle + "|"
                 + mDescription + "|"
                 + mDate + "|"
                 + mShouldRemind + "|"
                 + mPriority + "|"
                 + mRepeatType;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mTitle);
+        dest.writeString(mDescription);
+        dest.writeLong(mDate.getTime());
+        dest.writeInt(mShouldRemind ? 1 : 0);
+        dest.writeInt(mPriority);
+        if (mRepeatType != null) {
+            dest.writeInt(mRepeatType.ordinal());
+        } else {
+            dest.writeInt(-1);
+        }
+    }
+
+    public static final Parcelable.Creator<TodoItem> CREATOR
+            = new Parcelable.Creator<TodoItem>() {
+        public TodoItem createFromParcel(Parcel in) {
+            return new TodoItem(in);
+        }
+
+        public TodoItem[] newArray(int size) {
+            return new TodoItem[size];
+        }
+    };
+
+    private TodoItem(Parcel in) {
+        mId = in.readString();
+        mTitle = in.readString();
+        mDescription = in.readString();
+        mDate = new Date(in.readLong());
+        mShouldRemind = in.readInt() == 1;
+        mPriority = in.readInt();
+        int repeatTypeOrdinal = in.readInt();
+        if (repeatTypeOrdinal > 0) {
+            mRepeatType = Repeat.values()[repeatTypeOrdinal];
+        }
     }
 
     public enum Repeat {
