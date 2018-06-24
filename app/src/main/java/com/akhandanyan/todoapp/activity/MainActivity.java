@@ -27,6 +27,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private TodoItemAdapter.OnItemSelectedListener mOnItemSelectedListener = new TodoItemAdapter.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(TodoItem todoItem) {
+            openEditTodoItem(todoItem);
+        }
+    };
+
     private TodoItemAdapter mTodoItemAdapter;
 
     @Override
@@ -42,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(mOnClickListener);
 
         mTodoItemAdapter = new TodoItemAdapter();
+        mTodoItemAdapter.setOnItemSelectedListener(mOnItemSelectedListener);
         RecyclerView recyclerView = findViewById(R.id.recycler_activity_main);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -53,12 +61,24 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_CODE_ADD);
     }
 
+    private void openEditTodoItem(TodoItem todoItem) {
+        Intent intent = new Intent(this, TodoItemActivity.class);
+        intent.putExtra(TodoItemActivity.ARG_TODO_ITEM, todoItem);
+        startActivityForResult(intent, REQUEST_CODE_EDIT);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case REQUEST_CODE_ADD:
-                TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
-                mTodoItemAdapter.addItem(todoItem);
+            case REQUEST_CODE_ADD: {
+                    TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
+                    mTodoItemAdapter.addItem(todoItem);
+                }
+                break;
+            case REQUEST_CODE_EDIT: {
+                    TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
+                    mTodoItemAdapter.updateItem(todoItem);
+                }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);

@@ -20,7 +20,7 @@ import com.akhandanyan.todoapp.model.TodoItem;
 import com.akhandanyan.todoapp.util.DateUtil;
 
 import java.util.Calendar;
-import java.util.Date;import java.util.UUID;
+import java.util.UUID;
 
 public class TodoItemActivity extends AppCompatActivity {
     public static final String ARG_TODO_ITEM = "arg.todo.item";
@@ -72,11 +72,14 @@ public class TodoItemActivity extends AppCompatActivity {
     private TextInputEditText mDescriptionInput;
     private TextView mDateLabel;
     private CheckBox mReminderCheckBox;
+    private CheckBox mRepeatCheckBox;
     private RadioGroup mRepeatRadioGroup;
     private TextView mPriorityLabel;
 
     private Calendar mSelectedDate = Calendar.getInstance();
     private int mPriority = TodoItem.PRIORITY_MIN;
+
+    private TodoItem mTodoItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,13 +89,20 @@ public class TodoItemActivity extends AppCompatActivity {
         init();
 
         updateDateLabel();
+
+        if (getIntent().hasExtra(ARG_TODO_ITEM)) {
+            mTodoItem = getIntent().getParcelableExtra(ARG_TODO_ITEM);
+            fillData(mTodoItem);
+        }
     }
 
     private void init() {
         mTitleInput = findViewById(R.id.input_activity_todo_item_title);
         mDescriptionInput = findViewById(R.id.input_activity_todo_item_description);
         mReminderCheckBox = findViewById(R.id.checkbox_activity_todo_item_reminder);
+        mRepeatCheckBox = findViewById(R.id.checkbox_activity_todo_item_repeat);
         mRepeatRadioGroup = findViewById(R.id.radio_activity_todo_item_repeat);
+        mRepeatRadioGroup.setVisibility(View.GONE);
         mPriorityLabel = findViewById(R.id.label_activity_todo_item_priority_value);
         mDateLabel = findViewById(R.id.label_activity_todo_item_date);
 
@@ -105,9 +115,37 @@ public class TodoItemActivity extends AppCompatActivity {
                 setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                        toggleRepeatTypeGroupVisibility(isChecked);
                     }
         });
+    }
+
+    private void fillData(TodoItem todoItem) {
+        mTitleInput.setText(todoItem.getTitle());
+        mDescriptionInput.setText(todoItem.getDescription());
+        mSelectedDate.setTime(todoItem.getDate());
+        mDateLabel.setText(DateUtil.formatDateToLongStyle(mSelectedDate.getTime()));
+        mReminderCheckBox.setChecked(todoItem.isShouldRemind());
+        if (todoItem.getRepeatType() != null) {
+            switch (todoItem.getRepeatType()) {
+                case NONE:
+                    mRepeatCheckBox.setChecked(false);
+                    break;
+                case DAILY:
+                    mRepeatRadioGroup.check(R.id.radio_activity_todo_item_daily);
+                    mRepeatCheckBox.setChecked(true);
+                    break;
+                case WEEKLY:
+                    mRepeatRadioGroup.check(R.id.radio_activity_todo_item_weekly);
+                    mRepeatCheckBox.setChecked(true);
+                    break;
+                case MONTHLY:
+                    mRepeatCheckBox.setChecked(true);
+                    mRepeatRadioGroup.check(R.id.radio_activity_todo_item_monthly);
+                    break;
+            }
+        }
+        mPriorityLabel.setText(String.valueOf(todoItem.getPriority()));
     }
 
     private void submit() {
@@ -120,26 +158,33 @@ public class TodoItemActivity extends AppCompatActivity {
     }
 
     private TodoItem createTodoItemFromInput() {
-        TodoItem todoItem = new TodoItem();
-        todoItem.setId(UUID.randomUUID().toString());
-        todoItem.setTitle(mTitleInput.getText().toString());
-        todoItem.setDescription(mDescriptionInput.getText().toString());
-        todoItem.setDate(mSelectedDate.getTime());
-        todoItem.setShouldRemind(mReminderCheckBox.isChecked());
-        todoItem.setPriority(mPriority);
-        switch (mRepeatRadioGroup.getCheckedRadioButtonId()) {
-            case R.id.radio_activity_todo_item_daily:
-                todoItem.setRepeatType(TodoItem.Repeat.DAILY);
-                break;
-            case R.id.radio_activity_todo_item_weekly:
-                todoItem.setRepeatType(TodoItem.Repeat.WEEKLY);
-                break;
-            case R.id.radio_activity_todo_item_monthly:
-                todoItem.setRepeatType(TodoItem.Repeat.MONTHLY);
-                break;
+        if (mTodoItem == null) {
+            // If item is newly created initialize with uuid
+            mTodoItem = new TodoItem();
+            mTodoItem.setId(UUID.randomUUID().toString());
+        }
+        mTodoItem.setTitle(mTitleInput.getText().toString());
+        mTodoItem.setDescription(mDescriptionInput.getText().toString());
+        mTodoItem.setDate(mSelectedDate.getTime());
+        mTodoItem.setShouldRemind(mReminderCheckBox.isChecked());
+        mTodoItem.setPriority(mPriority);
+        if (mRepeatCheckBox.isChecked()) {
+            switch (mRepeatRadioGroup.getCheckedRadioButtonId()) {
+                case R.id.radio_activity_todo_item_daily:
+                    mTodoItem.setRepeatType(TodoItem.Repeat.DAILY);
+                    break;
+                case R.id.radio_activity_todo_item_weekly:
+                    mTodoItem.setRepeatType(TodoItem.Repeat.WEEKLY);
+                    break;
+                case R.id.radio_activity_todo_item_monthly:
+                    mTodoItem.setRepeatType(TodoItem.Repeat.MONTHLY);
+                    break;
+                default:
+                    mTodoItem.setRepeatType(TodoItem.Repeat.NONE);
+            }
         }
 
-        return todoItem;
+        return mTodoItem;
     }
 
     private void increasePriority() {
@@ -189,5 +234,13 @@ public class TodoItemActivity extends AppCompatActivity {
     private void openTimePicker() {
         new TimePickerDialog(this, mOnTimeSetListener, mSelectedDate.get(Calendar.HOUR_OF_DAY),
                 mSelectedDate.get(Calendar.MINUTE), true).show();
+    }
+
+    private void toggleRepeatTypeGroupVisibility(boolean visible) {
+        if (visible) {
+            mRepeatRadioGroup.setVisibility(View.VISIBLE);
+        } else {
+            mRepeatRadioGroup.setVisibility(View.GONE);
+        }
     }
 }
