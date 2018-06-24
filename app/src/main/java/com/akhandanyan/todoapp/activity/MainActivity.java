@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Toast;
 
 import com.akhandanyan.todoapp.R;
+import com.akhandanyan.todoapp.adapter.TodoItemAdapter;
 import com.akhandanyan.todoapp.model.TodoItem;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private TodoItemAdapter mTodoItemAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         FloatingActionButton fab = findViewById(R.id.fab_activity_main);
         fab.setOnClickListener(mOnClickListener);
+
+        mTodoItemAdapter = new TodoItemAdapter();
+        RecyclerView recyclerView = findViewById(R.id.recycler_activity_main);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(mTodoItemAdapter);
     }
 
     private void openAddTodoItem() {
@@ -48,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CODE_ADD:
                 TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
-                Toast.makeText(MainActivity.this, todoItem.toString(), Toast.LENGTH_LONG).show();
+                mTodoItemAdapter.addItem(todoItem);
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
