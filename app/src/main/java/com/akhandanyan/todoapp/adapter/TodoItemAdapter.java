@@ -82,7 +82,7 @@ public class TodoItemAdapter extends RecyclerView.Adapter<TodoItemViewHolder> {
         }
     }
 
-    public void removeItem(int position) {
+    private void removeItem(int position) {
         mData.remove(position);
         notifyItemRemoved(position);
     }

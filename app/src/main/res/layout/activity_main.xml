@@ -31,4 +31,12 @@
         android:tint="@android:color/white"
         app:srcCompat="@drawable/ic_add" />
 
+    <FrameLayout
+        android:id="@+id/container_activity_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_anchor="@id/toolbar"
+        android:elevation="6dp"
+        app:elevation="6dp"/>
+
 </android.support.design.widget.CoordinatorLayout>
