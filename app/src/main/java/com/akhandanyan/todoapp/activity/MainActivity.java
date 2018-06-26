@@ -71,13 +71,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_CODE_ADD: {
-                    TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
-                    mTodoItemAdapter.addItem(todoItem);
+                    if (resultCode == RESULT_OK) {
+                        TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
+                        mTodoItemAdapter.addItem(todoItem);
+                    }
                 }
                 break;
             case REQUEST_CODE_EDIT: {
-                    TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
-                    mTodoItemAdapter.updateItem(todoItem);
+                    if (resultCode == RESULT_OK) {
+                        TodoItem todoItem = data.getParcelableExtra(TodoItemActivity.ARG_TODO_ITEM);
+                        mTodoItemAdapter.updateItem(todoItem);
+                    }
                 }
                 break;
         }
